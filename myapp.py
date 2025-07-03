@@ -2,23 +2,31 @@ import yfinance as yf
 import streamlit as st
 import pandas as pd
 
-st.write("""
-# Simple Stock Price App
+st.title("Interactive Stock Price Viewer")
 
-Shown are the stock closing price and volume of Google!
-""")
+# Dropdown of popular stocks
+stock_options = {
+    "Google": "GOOGL",
+    "Apple": "AAPL",
+    "Tesla": "TSLA",
+    "Reliance (India)": "RELIANCE.NS",
+    "Infosys (India)": "INFY.NS"
+}
 
-# Define the ticker symbol
-tickerSymbol = 'GOOGL'
+selected_stock = st.selectbox("Select a Stock", options=list(stock_options.keys()))
+tickerSymbol = stock_options[selected_stock]
 
-# Get data on this ticker
+# Date range inputs
+start_date = st.date_input("Start Date", pd.to_datetime("2020-01-01"))
+end_date = st.date_input("End Date", pd.to_datetime("2023-01-01"))
+
+# Fetch data
 tickerData = yf.Ticker(tickerSymbol)
+tickerDf = tickerData.history(start=start_date, end=end_date)
 
-# Get the historical prices for this ticker
-tickerDf = tickerData.history(period='1d', start='2009-06-30', end='2025-06-30')
-
-st.write("## Closing Price")
+# Display data
+st.subheader(f"Closing Price of {selected_stock}")
 st.line_chart(tickerDf.Close)
 
-st.write("## Volume Price")
+st.subheader(f"Trading Volume of {selected_stock}")
 st.line_chart(tickerDf.Volume)
